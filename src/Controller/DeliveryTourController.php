@@ -27,18 +27,11 @@ class DeliveryTourController extends AbstractController
 {
   
 }
-    #[Route(methods: 'POST')]
+    #[Route(('/'), name: 'new',methods: 'POST')]
     public function new(Request $request): JsonResponse
     {
       $deliverytour= $this->serializer->deserialize($request->getContent(), DeliveryTour::class,'json');
-      $deliverytour= setCreatedAt(new DateTimeImmutable());
-
-      /*$deliverytour= new DeliveryTour();
-      $deliverytour= setOrigin('Paris');
-      $deliverytour= setDestination('Bordeaux');
-      $deliverytour= setMeansOfTransport('Plane');
-      $deliverytour= setDescription('I have some space on my suitcase so I can carry a parsel for you');*/
-      
+      $deliverytour-> setCreatedAt(new DateTimeImmutable());
 
       // Tell Doctrine you want to (eventually) save the deliverytour (no queries yet)
       $this->manager->persist($deliverytour);
@@ -48,7 +41,7 @@ class DeliveryTourController extends AbstractController
 
        $responseData = $this->serializer->serialize($deliverytour, 'json');
        $location= $this->urlGenerator->generate(
-        'app_api_restaurant_show',
+        'app_api_deliverytour_show',
         ['id'=>$deliverytour->getId()],
         UrlGeneratorInterface::ABSOLUTE_URL,
        );
@@ -62,21 +55,36 @@ class DeliveryTourController extends AbstractController
     {
       $deliverytour = $this->repository->findOneBy(['id'=>$id]);
 
-      if(!$deliverytour){
-        throw $this->createNotFoundException("No Delivery Tour found for {$id} id");
+      if($deliverytour){
+        $responseData= $this->serializer->serialize($deliverytour,'json');
+        
+        return new JsonResponse($responseData, Response::HTTP_OK,[],true);
       }
-      return $this->json(['message'=>"A Delivery Tour from: {$deliverytour->getOrigin()}, to {$deliverytour->getDestination()} with id:{$deliverytour->getId()}"]);
+      
+      return new JsonResponse(null, Response::HTTP_NOT_FOUND);
     }
-    
+    /*
     #[Route(('/{$id}'), name: 'edit', methods: 'PUT')]
-    public function edit(int $id): JsonResponse
+    public function edit(int $id, Request $request): JsonResponse
     {
       $deliverytour = $this->repository->findOneBy(['id'=>$id]);
 
-      if(!$deliverytour){
-        throw $this->createNotFoundException("No Delivery Tour found for {$id} id");
+      if($deliverytour){
+        $deliverytour= $this->serializer->deserialize(
+          $request->getContent(),
+          DeliveryTour::class,
+          'json',
+          [AbstractNormalizer::OBJECT_TO_POPULATE=>$deliverytour]
+        );
+        $deliverytour->setUpdatedAt(new DateTimeImmutable());
+        
+        $this->manager->flush();
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
       }
 
+      return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+/*
       $deliverytour= setOrigin('Origin Updated');
       $deliverytour= setDestination('Destination Updated');
       $deliverytour= setMeansOfTransport('Mean of Trasport  updated');
@@ -85,6 +93,18 @@ class DeliveryTourController extends AbstractController
       $this->manager->flush();
 
       return $this ->redirectToRoute('app_api_deliverytour_show',['id'=>$deliverytour->getId()]);
+    }*/
+    #[Route('/{id}', name: 'edit', methods: 'PUT')]
+    public function edit(int $id): Response
+    {
+        $deliverytour = $this->repository->findOneBy(['id' => $id]);
+        if (!$deliverytour) {
+            throw $this->createNotFoundException("No Restaurant found for {$id} id");
+        }
+
+        $deliverytour->setOrigin('Origin updated');
+        $this->manager->flush();
+        return $this->redirectToRoute('app_api_deliverytour_show', ['id' => $deliverytour->getId()]);
     }
    
     #[Route(('/{id}'), name: 'delete', methods: 'DELETE')]
@@ -92,13 +112,15 @@ class DeliveryTourController extends AbstractController
     {
         $deliverytour = $this->repository->findOneBy(['id'=>$id]);
 
-        if(!$deliverytour){
-            throw $this->createNotFoundException("No Delivery Tour found for {$id} id");
-          }
-
+        if($deliverytour){
           $this->manager->remove($deliverytour);
           $this->manager->flush();
 
-          return $this->json(['message'=>"Delivery Tour source deleted"], Response::HTTP_NO_CONTENT);      
+          return new JsonResponse(null,Response::HTTP_NO_CONTENT);
+          }
+
+          
+
+          return new JsonResponse(null, Response::HTTP_NO_CONTENT);      
     }
 }
