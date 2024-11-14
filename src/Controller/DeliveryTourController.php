@@ -12,7 +12,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use DateTimeImmutable ;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 
 #[Route('api/deliverytour', name: 'app_api_deliverytour_')]
@@ -49,7 +53,29 @@ class DeliveryTourController extends AbstractController
      Response::HTTP_CREATED,["Location"=>$location],true);
     }
     
-
+    /**
+     * List the rewards of the specified user.
+     *
+     * This call takes into account all confirmed awards, but not pending or refused awards.
+     *
+     * @Route("/{id}", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns the rewards of an user",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Reward::class, groups={"full"}))
+     *     )
+     * )
+     *« @OA\RequestBody(
+     *     name="order",
+     *     in="query",
+     *     description="The field used to order rewards",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Tag(name="rewards")
+     * @Security(name="Bearer")
+     */
     #[Route(('/{id}'), name: 'show', methods: 'GET')]
     public function show(int $id): JsonResponse
     {
@@ -95,16 +121,23 @@ class DeliveryTourController extends AbstractController
       return $this ->redirectToRoute('app_api_deliverytour_show',['id'=>$deliverytour->getId()]);
     }*/
     #[Route('/{id}', name: 'edit', methods: 'PUT')]
-    public function edit(int $id): Response
+    public function edit(int $id, Request $request):JsonResponse
     {
         $deliverytour = $this->repository->findOneBy(['id' => $id]);
-        if (!$deliverytour) {
-            throw $this->createNotFoundException("No Restaurant found for {$id} id");
-        }
+                if ($deliverytour) {
+                    $deliverytour = $this->serializer->deserialize(
+                     $request->getContent(),
+                     DeliveryTour::class,
+                     'json',
+                     [AbstractNormalizer::OBJECT_TO_POPULATE => $deliverytour]
+                    );
+                    $deliverytour->setUpdatedAt(new DateTimeImmutable());
 
-        $deliverytour->setOrigin('Origin updated');
-        $this->manager->flush();
-        return $this->redirectToRoute('app_api_deliverytour_show', ['id' => $deliverytour->getId()]);
+                    $this->manager->flush();
+
+                    return new JsonResponse(null,Response::HTTP_NO_CONTENT);
+                }
+                return new JsonResponse(null, Response::HTTP_NOT_FOUND);
     }
    
     #[Route(('/{id}'), name: 'delete', methods: 'DELETE')]
