@@ -31,6 +31,32 @@ class DeliveryTourController extends AbstractController
 {
   
 }
+
+
+     /**
+     *  Get the information of a Delivery Tour.
+     *
+     * Fill the body with the parameters requested
+     *
+     * @Route("/{id}", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns a delivery tour info",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=DeliveryTour::class))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="order",
+     *     in="query",
+     *     description="The field used to order rewards",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Tag(name="user")
+     * @Security(name="user")
+     */
+
     #[Route(('/'), name: 'new',methods: 'POST')]
     public function new(Request $request): JsonResponse
     {
@@ -52,30 +78,30 @@ class DeliveryTourController extends AbstractController
      return new JsonResponse($responseData, 
      Response::HTTP_CREATED,["Location"=>$location],true);
     }
-    
-    /**
-     * List the rewards of the specified user.
+   /**
+     *  Get the information of a Delivery Tour.
      *
-     * This call takes into account all confirmed awards, but not pending or refused awards.
+     * Fill the body with the parameters requested
      *
      * @Route("/{id}", methods={"GET"})
      * @OA\Response(
      *     response=200,
-     *     description="Returns the rewards of an user",
+     *     description="Returns a delivery tour info",
      *     @OA\JsonContent(
      *        type="array",
-     *        @OA\Items(ref=@Model(type=Reward::class, groups={"full"}))
+     *        @OA\Items(ref=@Model(type=DeliveryTour::class))
      *     )
      * )
-     *« @OA\RequestBody(
+     * @OA\Parameter(
      *     name="order",
      *     in="query",
      *     description="The field used to order rewards",
      *     @OA\Schema(type="string")
      * )
-     * @OA\Tag(name="rewards")
-     * @Security(name="Bearer")
+     * @OA\Tag(name="user")
+     * @Security(name="user")
      */
+
     #[Route(('/{id}'), name: 'show', methods: 'GET')]
     public function show(int $id): JsonResponse
     {

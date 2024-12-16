@@ -28,29 +28,29 @@ class SecurityController extends AbstractController
   )  {
      
     }
-     /**
-     * Create a new User.
+    /**
+     * Regustrate an user.
      *
      * This call takes into account all confirmed awards, but not pending or refused awards.
      *
-     * @Route("/registration", methods={"POST"})
+     *@Route("/registration", methods={"POST"})
+     *@OA\Parameter(
+     *     email="toto@gmail.com",
+     *     password="MyPassword",
      * @OA\Response(
      *     response=200,
-     *     description="Returns the rewards of an user",
+     *     description="Registration of an user,
      *     @OA\JsonContent(
      *        type="array",
-     *        @OA\Items(ref=@Model(type=Reward::class, groups={"full"}))
+     *        @OA\Items(ref=@Model(type=User::class, groups={"full"}))
      *     )
      * )
-     * @OA\Parameter(
-     *     name="order",
-     *     in="query",
-     *     description="The field used to order rewards",
-     *     @OA\Schema(type="string")
+    
      * )
-     * @OA\Tag(name="rewards")
-     * @Security(name="Bearer")
+     * @OA\Tag(name="user")
      */
+
+      
     #[Route('/registration', name: 'registration', methods: 'POST')]
     public function register(Request $request): JsonResponse
     {

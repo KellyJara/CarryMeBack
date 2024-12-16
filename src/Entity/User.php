@@ -20,6 +20,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var int
      * @OA\Property(description="The unique identifier of the user.")
      */
+
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -42,6 +43,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $apiToken = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $Lastname = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $Name = null;
 
     public function __construct()
     {
@@ -169,6 +176,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setApiToken(string $apiToken): static
     {
         $this->apiToken = $apiToken;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->Lastname;
+    }
+
+    public function setLastname(string $Lastname): static
+    {
+        $this->Lastname = $Lastname;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->Name;
+    }
+
+    public function setName(string $Name): static
+    {
+        $this->Name = $Name;
 
         return $this;
     }
