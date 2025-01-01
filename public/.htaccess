@@ -1,0 +1,21 @@
+# Habilitar reescritura de URLs
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Asegurarse de que las URLs pasen correctamente al archivo index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# Evitar el acceso directo a archivos sensibles de Symfony
+<FilesMatch "\.(env|yml|yaml|xml|twig|php)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Evitar el acceso a la carpeta .git
+<DirectoryMatch "^/.git">
+    Order allow,deny
+    Deny from all
+</DirectoryMatch>
