@@ -1,13 +1,26 @@
 nelmio_cors:
     defaults:
-        origin_regex: true
-        allow_origin: ['*']
-        allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
-        allow_headers: ['Content-Type', 'Authorization']
-        expose_headers: ['Link']
-        max_age: 3600
+        allow_credentials: false
+        allow_origin: []
+        allow_headers: []
+        allow_methods: []
+        allow_private_network: false
+        expose_headers: []
+        max_age: 0
+        hosts: []
+        origin_regex: false
+        forced_allow_origin_value: ~
+        skip_same_as_origin: true
     paths:
-        '^/api/':  # Esto aplica solo para rutas que comienzan con "/api/"
-            allow_origin: ['*']  # Permitir solicitudes de cualquier origen
-            allow_methods: ['GET', 'POST', 'PUT', 'DELETE']
-            allow_headers: ['Content-Type', 'Authorization']
+        '^/api/':
+            allow_origin: ['localhost:3000']
+            allow_headers: ['X-Custom-Auth']
+            allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
+            max_age: 3600
+        '^/':
+            origin_regex: true
+            allow_origin: ['localhost:3000']
+            allow_headers: ['X-Custom-Auth']
+            allow_methods: ['POST', 'PUT', 'GET', 'DELETE']
+            max_age: 3600
+            hosts: ['^api\.']
