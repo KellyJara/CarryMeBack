@@ -61,7 +61,7 @@ class DeliveryTourController extends AbstractController
     public function new(Request $request): JsonResponse
     {
       $deliverytour= $this->serializer->deserialize($request->getContent(), DeliveryTour::class,'json');
-      $deliverytour-> setCreatedAt(new DateTimeImmutable());
+      $deliverytour-> setCreatedAt(new DateTimeImmutable());    
 
       // Tell Doctrine you want to (eventually) save the deliverytour (no queries yet)
       $this->manager->persist($deliverytour);
@@ -69,12 +69,6 @@ class DeliveryTourController extends AbstractController
       $this->manager->flush(); 
        // A stocker en base de donnees
 
-       $responseData = $this->serializer->serialize($deliverytour, 'json');
-       $location= $this->urlGenerator->generate(
-        'app_api_deliverytour_show',
-        ['id'=>$deliverytour->getId()],
-        UrlGeneratorInterface::ABSOLUTE_URL,
-       );
      return new JsonResponse($responseData, 
      Response::HTTP_CREATED,["Location"=>$location],true);
     }

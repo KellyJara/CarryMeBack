@@ -32,6 +32,10 @@ class DeliveryTour
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $UpdatedAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'deliveryTours')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $User = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -108,4 +112,23 @@ class DeliveryTour
 
         return $this;
     }
+
+    public function getUser(): ?User
+    {
+        return $this->User;
+    }
+
+    public function setUser(?User $User): static
+    {
+        $this->User = $User;
+
+        return $this;
+    }
+
+   /* public function setUser(?User $User): static
+    {
+        $this->User = $User;
+
+        return $this;
+    }*/
 }

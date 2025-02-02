@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -50,9 +52,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $Name = null;
 
+    #[ORM\OneToMany(targetEntity: DeliveryTour::class, mappedBy: 'User', orphanRemoval: true)]
+    private Collection $deliveryTours;
+
     public function __construct()
     {
         $this->apiToken = bin2hex(random_bytes(20));
+        $this->deliveryTours = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -200,6 +206,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setName(string $Name): static
     {
         $this->Name = $Name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DeliveryTour>
+     */
+    public function getDeliveryTours(): Collection
+    {
+        return $this->deliveryTours;
+    }
+
+    public function addDeliveryTour(DeliveryTour $deliveryTour): static
+    {
+        if (!$this->deliveryTours->contains($deliveryTour)) {
+            $this->deliveryTours->add($deliveryTour);
+            $deliveryTour->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDeliveryTour(DeliveryTour $deliveryTour): static
+    {
+        if ($this->deliveryTours->removeElement($deliveryTour)) {
+            // set the owning side to null (unless already changed)
+            if ($deliveryTour->getUser() === $this) {
+                $deliveryTour->setUser(null);
+            }
+        }
 
         return $this;
     }
